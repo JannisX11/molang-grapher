@@ -283,7 +283,6 @@ MolangParser.variableHandler = function (variable) {
       document.addEventListener('mouseup', stop);
     },
     scroll: function scroll(event) {
-      console.log('scr');
       var old_scale = this.scale;
 
       if (event.deltaY > 0) {
@@ -320,7 +319,7 @@ MolangParser.variableHandler = function (variable) {
     updateGraph: function updateGraph() {
       var path = "M".concat(this.posX, " ").concat(this.posY);
 
-      for (var x = 0; x < window.innerWidth; x += 4) {
+      for (var x = 0; x < window.innerWidth; x += 2) {
         X = (x - this.posX) / this.scale;
         var val = MolangParser.parse(this.code);
         path += x ? ' L' : 'M';

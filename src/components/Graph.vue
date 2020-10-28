@@ -67,8 +67,6 @@ export default {
 			document.addEventListener('mouseup', stop)
 		},
 		scroll(event) {
-			console.log('scr')
-
 			let old_scale = this.scale;
             if (event.deltaY > 0) {
                 this.scale /= 1.1
@@ -102,12 +100,11 @@ export default {
 			for (var y = this.posY % this.scale; y < window.innerHeight; y += this.scale) {
 				this.grid += `M0 ${ y } L${window.innerWidth} ${ y } `;
 			}
-
 		},
 		updateGraph() {
 			let path = `M${this.posX} ${this.posY}`;
 
-			for (var x = 0; x < window.innerWidth; x += 4) {
+			for (var x = 0; x < window.innerWidth; x += 2) {
 				X = (x - this.posX) / this.scale;
 				let val = MolangParser.parse(this.code);
 

@@ -110,6 +110,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+var default_code = 'Math.sin(query.anim_time * 90)';
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'app',
   components: {
@@ -118,7 +119,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      code: localStorage.getItem('molang-grapher-code') || ''
+      code: localStorage.getItem('molang-grapher-code') || default_code
     };
   },
   methods: {
@@ -282,6 +283,7 @@ MolangParser.variableHandler = function (variable) {
       document.addEventListener('mouseup', stop);
     },
     scroll: function scroll(event) {
+      console.log('scr');
       var old_scale = this.scale;
 
       if (event.deltaY > 0) {
@@ -16055,7 +16057,7 @@ var render = function() {
         mousedown: function($event) {
           return _vm.startDrag($event)
         },
-        mousewheel: function($event) {
+        wheel: function($event) {
           return _vm.scroll($event)
         }
       }

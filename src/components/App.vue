@@ -13,12 +13,13 @@ import Graph from './Graph'
 
 import './../util'
 
+const default_code = 'Math.sin(query.anim_time * 90)';
 
 export default {
 	name: 'app',
 	components: {ExpressionBar, Graph},
 	data() {return {
-		code: (localStorage.getItem('molang-grapher-code') || '')
+		code: (localStorage.getItem('molang-grapher-code') || default_code)
 	}},
 	methods: {
 		changeCode(code) {

@@ -1,5 +1,5 @@
 <template>
-    <div id="graph" @mousedown="startDrag($event)" @mousewheel="scroll($event)">
+    <div id="graph" @mousedown="startDrag($event)" @wheel="scroll($event)">
 		<svg>
 			<path class="axes" :d="axes" />
 
@@ -67,6 +67,7 @@ export default {
 			document.addEventListener('mouseup', stop)
 		},
 		scroll(event) {
+			console.log('scr')
 
 			let old_scale = this.scale;
             if (event.deltaY > 0) {

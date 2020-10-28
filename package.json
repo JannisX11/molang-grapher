@@ -1,0 +1,48 @@
+{
+	"name": "molang-grapher",
+	"version": "0.0.1",
+	"description": "MoLang Grapher",
+	"author": {
+		"name": "JannisX11",
+		"email": "info@blockbench.net"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/JannisX11/molang-grapher"
+	},
+	"license": "GPL-3.0-or-later",
+	"scripts": {
+		"dev": "npm run development",
+		"development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+		"watch": "npm run development -- --watch",
+		"hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+		"prod": "npm run production",
+		"production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+	},
+	"devDependencies": {
+		"cross-env": "^7.0.2",
+		"laravel-mix": "^5.0.5",
+		"resolve-url-loader": "^3.1.1",
+		"sass": "^1.26.9",
+		"sass-loader": "^8.0.2",
+		"url-loader": "^4.1.0",
+		"vue-template-compiler": "^2.6.11",
+		"webpack": "^4.44.2",
+		"webpack-cli": "^3.3.12"
+	},
+	"dependencies": {
+		"@fortawesome/fontawesome-free": "^5.13.1",
+		"@fortawesome/fontawesome-svg-core": "^1.2.29",
+		"@fortawesome/free-solid-svg-icons": "^5.13.1",
+		"@fortawesome/vue-fontawesome": "^0.1.10",
+		"@popperjs/core": "^2.4.3",
+		"jquery": "^3.5.1",
+		"molangjs": "^1.2.0",
+		"prismjs": "^1.20.0",
+		"tinycolor2": "^1.4.1",
+		"vue": "^2.6.11",
+		"vue-color": "^2.7.1",
+		"vue-prism-component": "^1.2.0",
+		"vue-prism-editor": "^0.6.1"
+	}
+}

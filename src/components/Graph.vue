@@ -10,7 +10,8 @@
 		</svg>
 		<div id="hover_note" v-if="hover_note" :style="{'left': hover_note_X + 'px', 'top': (hover_note_Y - 35) + 'px'}">{{hover_note}}</div>
 		<div id="hover_dot" v-if="hover_note" :style="{'left': hover_note_X + 'px', 'top': hover_note_Y + 'px'}"></div>
-		<div class="zero_dot" v-for="time in zero_points" :key="time" :style="{'left': (posX + time * scale) + 'px', 'top': (time ? posY : posY + Y_axis_cross * scale) + 'px'}"></div>
+		<div class="zero_dot" v-for="time in zero_points" :key="time" :style="{'left': (posX + time * scale) + 'px', 'top': posY + 'px'}"></div>
+		<div class="zero_dot" v-if="(posY + Y_axis_cross * scale) > 0 && (posY + Y_axis_cross * scale) < sizeY" :style="{'left': posX + 'px', 'top': (posY + Y_axis_cross * scale) + 'px'}"></div>
     </div>
 </template>
 
@@ -66,7 +67,7 @@ export default {
 			let rounding = Math.round(this.scale / 24) * 12;
 			X = (event.clientX - rect.left - this.posX) / this.scale;
 			let found_zero_point = false;
-			for (var time of this.zero_points) {
+			for (var time of [0, ...this.zero_points]) {
 				if (Math.abs(time - X) < (6 / this.scale)) {
 					X = time;
 					found_zero_point = true;
@@ -89,8 +90,8 @@ export default {
 			let scope = this;
 			let original_pos = [this.posX, this.posY]
 			function drag(e) {
-				scope.posX = original_pos[0] + e.clientX - event.clientX;
-				scope.posY = original_pos[1] + e.clientY - event.clientY;
+				scope.posX = Math.round(original_pos[0] + e.clientX - event.clientX);
+				scope.posY = Math.round(original_pos[1] + e.clientY - event.clientY);
 				scope.updateView();
 			}
 			function stop(e) {
@@ -112,8 +113,8 @@ export default {
 			let factor = (1-this.scale/old_scale);
 			var rect = this.$el.getBoundingClientRect();
 
-            this.posX += factor * (event.clientX - rect.left - this.posX);
-            this.posY += factor * (event.clientY - rect.top - this.posY);
+            this.posX += Math.round(factor * (event.clientX - rect.left - this.posX));
+            this.posY += Math.round(factor * (event.clientY - rect.top - this.posY));
 
 			this.updateView();
 		},
@@ -137,7 +138,7 @@ export default {
 		},
 		updateGraph() {
 			X = 0;
-			this.zero_points.splice(0, Infinity, X);
+			this.zero_points.splice(0, Infinity);
 			this.Y_axis_cross = -MolangParser.parse(this.code);
 
 			let path = `M${this.posX} ${this.posY}`;

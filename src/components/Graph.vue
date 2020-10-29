@@ -10,6 +10,7 @@
 		</svg>
 		<div id="hover_note" v-if="hover_note" :style="{'left': hover_note_X + 'px', 'top': (hover_note_Y - 35) + 'px'}">{{hover_note}}</div>
 		<div id="hover_dot" v-if="hover_note" :style="{'left': hover_note_X + 'px', 'top': hover_note_Y + 'px'}"></div>
+		<div class="zero_dot" v-for="time in zero_points" :key="time" :style="{'left': (posX + time * scale) + 'px', 'top': (time ? posY : posY + Y_axis_cross * scale) + 'px'}"></div>
     </div>
 </template>
 
@@ -42,8 +43,8 @@ export default {
 		hover_note: '',
 		hover_note_X: 0,
 		hover_note_Y: 0,
-		hover_dot_X: 0,
-		hover_dot_Y: 0,
+		zero_points: [],
+		Y_axis_cross: 0,
 	}},
 	watch: {
 		code(code) {
@@ -61,14 +62,24 @@ export default {
 	methods: {
 		hoverCurve(event) {
 			var rect = this.$el.getBoundingClientRect();
-			let rounding = Math.round(this.scale);
+
+			let rounding = Math.round(this.scale / 24) * 12;
 			X = (event.clientX - rect.left - this.posX) / this.scale;
-			X = Math.round(X * rounding) / rounding;
+			let found_zero_point = false;
+			for (var time of this.zero_points) {
+				if (Math.abs(time - X) < (6 / this.scale)) {
+					X = time;
+					found_zero_point = true;
+					break;
+				}
+			}
+			if (!found_zero_point) X = Math.round(X * rounding) / rounding;
+
 			let val = MolangParser.parse(this.code);
 			
-			this.hover_note = `${Math.roundTo(X, 4)} / ${Math.roundTo(val, 4)}`;
-			this.hover_note_X = this.posX + X   * this.scale + rect.left;
-			this.hover_note_Y = this.posY + val * this.scale + rect.top;
+			this.hover_note = `${Math.roundTo(X, 3)} / ${Math.roundTo(val, 3)}`;
+			this.hover_note_X = this.posX + X   * this.scale;
+			this.hover_note_Y = this.posY + val * this.scale;
 		},
 		exitCurve(event) {
 			this.hover_note = '';
@@ -125,14 +136,28 @@ export default {
 			}
 		},
 		updateGraph() {
-			let path = `M${this.posX} ${this.posY}`;
+			X = 0;
+			this.zero_points.splice(0, Infinity, X);
+			this.Y_axis_cross = MolangParser.parse(this.code);
 
+			let path = `M${this.posX} ${this.posY}`;
+			let before = 0;
 			for (var x = 0; x < window.innerWidth; x += 1) {
 				X = (x - this.posX) / this.scale;
 				let val = MolangParser.parse(this.code);
 
 				path += x ? ' L' : 'M';
 				path += `${ x } ${ this.posY + val * this.scale }`;
+
+				// Zero Points
+				if (val == 0) {
+					this.zero_points.push(X);
+				} else if ((before > 0 && val < 0) || (before < 0 && val > 0)) {
+					let lerp = 1 / ((val - before) / val);
+					this.zero_points.push(X - lerp/this.scale);
+				}
+				
+				before = val;
 			}
 			this.graph = path;
 		}
@@ -148,6 +173,9 @@ export default {
 </script>
 
 <style scoped>
+	#graph {
+		position: relative;
+	}
 	svg {
 		width: 100%;
 		height: 100%;
@@ -175,6 +203,15 @@ export default {
 		opacity: 0.4;
 		stroke: var(--color-title);
 	}
+	.zero_dot {
+		position: absolute;
+		pointer-events: none;
+		background-color: #f72858;
+		height: 6px;
+		width: 6px;
+		margin: -3px;
+		border-radius: 3px;
+	}
 	#hover_note {
 		position: absolute;
 		pointer-events: none;
@@ -182,16 +219,18 @@ export default {
 		color: #99a;
 		padding: 5px;
 		border-radius: 5px;
+		z-index: 2;
 		transition: left 100ms linear, top 100ms linear;
 	}
 	#hover_dot {
 		position: absolute;
 		pointer-events: none;
 		background-color: #f72858;
-		height: 8px;
-		width: 8px;
-		margin: -4px;
-		border-radius: 4px;
+		height: 10px;
+		width: 10px;
+		margin: -5px;
+		border-radius: 5px;
+		z-index: 2;
 		transition: left 100ms linear, top 100ms linear;
 	}
 </style>

@@ -217,6 +217,13 @@ var ExpandedInput = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var molangjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! molangjs */ "./node_modules/molangjs/dist/molang.cjs.js");
 /* harmony import */ var molangjs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(molangjs__WEBPACK_IMPORTED_MODULE_0__);
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+//
 //
 //
 //
@@ -259,8 +266,8 @@ MolangParser.variableHandler = function (variable) {
       hover_note: '',
       hover_note_X: 0,
       hover_note_Y: 0,
-      hover_dot_X: 0,
-      hover_dot_Y: 0
+      zero_points: [],
+      Y_axis_cross: 0
     };
   },
   watch: {
@@ -279,13 +286,34 @@ MolangParser.variableHandler = function (variable) {
   methods: {
     hoverCurve: function hoverCurve(event) {
       var rect = this.$el.getBoundingClientRect();
-      var rounding = Math.round(this.scale);
+      var rounding = Math.round(this.scale / 24) * 12;
       X = (event.clientX - rect.left - this.posX) / this.scale;
-      X = Math.round(X * rounding) / rounding;
+      var found_zero_point = false;
+
+      var _iterator = _createForOfIteratorHelper(this.zero_points),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var time = _step.value;
+
+          if (Math.abs(time - X) < 6 / this.scale) {
+            X = time;
+            found_zero_point = true;
+            break;
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      if (!found_zero_point) X = Math.round(X * rounding) / rounding;
       var val = MolangParser.parse(this.code);
-      this.hover_note = "".concat(Math.roundTo(X, 4), " / ").concat(Math.roundTo(val, 4));
-      this.hover_note_X = this.posX + X * this.scale + rect.left;
-      this.hover_note_Y = this.posY + val * this.scale + rect.top;
+      this.hover_note = "".concat(Math.roundTo(X, 3), " / ").concat(Math.roundTo(val, 3));
+      this.hover_note_X = this.posX + X * this.scale;
+      this.hover_note_Y = this.posY + val * this.scale;
     },
     exitCurve: function exitCurve(event) {
       this.hover_note = '';
@@ -344,13 +372,26 @@ MolangParser.variableHandler = function (variable) {
       }
     },
     updateGraph: function updateGraph() {
+      X = 0;
+      this.zero_points.splice(0, Infinity, X);
+      this.Y_axis_cross = MolangParser.parse(this.code);
       var path = "M".concat(this.posX, " ").concat(this.posY);
+      var before = 0;
 
       for (var x = 0; x < window.innerWidth; x += 1) {
         X = (x - this.posX) / this.scale;
         var val = MolangParser.parse(this.code);
         path += x ? ' L' : 'M';
-        path += "".concat(x, " ").concat(this.posY + val * this.scale);
+        path += "".concat(x, " ").concat(this.posY + val * this.scale); // Zero Points
+
+        if (val == 0) {
+          this.zero_points.push(X);
+        } else if (before > 0 && val < 0 || before < 0 && val > 0) {
+          var lerp = 1 / ((val - before) / val);
+          this.zero_points.push(X - lerp / this.scale);
+        }
+
+        before = val;
       }
 
       this.graph = path;
@@ -494,7 +535,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, "\nsvg[data-v-ae5d5364] {\n\twidth: 100%;\n\theight: 100%;\n}\npath[data-v-ae5d5364] {\n\tfill: none;\n}\npath.curve[data-v-ae5d5364] {\n\tstroke: #f72858;\n\tpointer-events: none;\n\tstroke-width: 2px;\n}\npath.curve_hover[data-v-ae5d5364] {\n\tstroke: transparent;\n\tstroke-width: 14px;\n}\npath.axes[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke: var(--color-title);\n\tstroke-width: 2px;\n}\npath.grid[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke-width: 1px;\n\topacity: 0.4;\n\tstroke: var(--color-title);\n}\n#hover_note[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: aliceblue;\n\tcolor: #99a;\n\tpadding: 5px;\n\tborder-radius: 5px;\n\ttransition: left 100ms linear, top 100ms linear;\n}\n#hover_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 8px;\n\twidth: 8px;\n\tmargin: -4px;\n\tborder-radius: 4px;\n\ttransition: left 100ms linear, top 100ms linear;\n}\n", ""]);
+exports.push([module.i, "\n#graph[data-v-ae5d5364] {\n\tposition: relative;\n}\nsvg[data-v-ae5d5364] {\n\twidth: 100%;\n\theight: 100%;\n}\npath[data-v-ae5d5364] {\n\tfill: none;\n}\npath.curve[data-v-ae5d5364] {\n\tstroke: #f72858;\n\tpointer-events: none;\n\tstroke-width: 2px;\n}\npath.curve_hover[data-v-ae5d5364] {\n\tstroke: transparent;\n\tstroke-width: 14px;\n}\npath.axes[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke: var(--color-title);\n\tstroke-width: 2px;\n}\npath.grid[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke-width: 1px;\n\topacity: 0.4;\n\tstroke: var(--color-title);\n}\n.zero_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 6px;\n\twidth: 6px;\n\tmargin: -3px;\n\tborder-radius: 3px;\n}\n#hover_note[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: aliceblue;\n\tcolor: #99a;\n\tpadding: 5px;\n\tborder-radius: 5px;\n\tz-index: 2;\n\ttransition: left 100ms linear, top 100ms linear;\n}\n#hover_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 10px;\n\twidth: 10px;\n\tmargin: -5px;\n\tborder-radius: 5px;\n\tz-index: 2;\n\ttransition: left 100ms linear, top 100ms linear;\n}\n", ""]);
 
 // exports
 
@@ -14953,8 +14994,21 @@ var render = function() {
             },
             attrs: { id: "hover_dot" }
           })
-        : _vm._e()
-    ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm._l(_vm.zero_points, function(time) {
+        return _c("div", {
+          key: time,
+          staticClass: "zero_dot",
+          style: {
+            left: _vm.posX + time * _vm.scale + "px",
+            top:
+              (time ? _vm.posY : _vm.posY + _vm.Y_axis_cross * _vm.scale) + "px"
+          }
+        })
+      })
+    ],
+    2
   )
 }
 var staticRenderFns = []

@@ -135,6 +135,17 @@
         color: var(--color-text);
         text-align: left;
 	}
+	a {
+		text-decoration: none;
+		color: var(--color-text);
+	}
+	a:hover {
+		text-decoration: none;
+		color: var(--color-highlight);
+	}
+	a:active {
+		text-decoration: underline;
+	}
 
 /*Color Picker*/
 	

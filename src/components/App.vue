@@ -2,7 +2,12 @@
     <div id="app">
 
 		<expression-bar :code="code" @change="changeCode"></expression-bar>
+
 		<graph :code="code"></graph>
+
+		<div id="info_bar">
+			<a href="https://github.com/JannisX11/molang-grapher" target="_blank">GitHub</a>
+		</div>
 
     </div>
 </template>
@@ -68,6 +73,15 @@ export default {
 	}
 	#graph {
 		flex: 1 0 100px;
+	}
+	#info_bar {
+		flex: 0 0 27px;
+		background-color: var(--color-dark);
+		border-top: 1px solid var(--color-border);
+	}
+	#info_bar a {
+		display: inline-block;
+		padding: 2px 16px;
 	}
 
 </style>

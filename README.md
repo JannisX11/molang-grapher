@@ -1,2 +1,3 @@
 # molang-grapher
-MoLang Grapher
+
+[MoLang Grapher](https://jannisx11.github.io/molang-grapher/)

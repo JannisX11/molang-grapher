@@ -313,7 +313,7 @@ MolangParser.variableHandler = function (variable) {
       var val = MolangParser.parse(this.code);
       this.hover_note = "".concat(Math.roundTo(X, 3), " / ").concat(Math.roundTo(val, 3));
       this.hover_note_X = this.posX + X * this.scale;
-      this.hover_note_Y = this.posY + val * this.scale;
+      this.hover_note_Y = this.posY - val * this.scale;
     },
     exitCurve: function exitCurve(event) {
       this.hover_note = '';
@@ -374,21 +374,21 @@ MolangParser.variableHandler = function (variable) {
     updateGraph: function updateGraph() {
       X = 0;
       this.zero_points.splice(0, Infinity, X);
-      this.Y_axis_cross = MolangParser.parse(this.code);
+      this.Y_axis_cross = -MolangParser.parse(this.code);
       var path = "M".concat(this.posX, " ").concat(this.posY);
       var before = 0;
 
       for (var x = 0; x < window.innerWidth; x += 1) {
         X = (x - this.posX) / this.scale;
-        var val = MolangParser.parse(this.code);
-        path += x ? ' L' : 'M';
-        path += "".concat(x, " ").concat(this.posY + val * this.scale); // Zero Points
+        var val = -MolangParser.parse(this.code);
+        path += x && !isNaN(val) && !isNaN(before) ? ' L' : 'M';
+        path += "".concat(x, " ").concat(Math.clamp(this.posY + val * this.scale, -30, window.innerHeight)); // Zero Points
 
-        if (val == 0) {
-          this.zero_points.push(X);
+        if (val == 0 && before != 0) {
+          this.zero_points.safePush(X);
         } else if (before > 0 && val < 0 || before < 0 && val > 0) {
           var lerp = 1 / ((val - before) / val);
-          this.zero_points.push(X - lerp / this.scale);
+          this.zero_points.safePush(X - lerp / this.scale);
         }
 
         before = val;
@@ -535,7 +535,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, "\n#graph[data-v-ae5d5364] {\n\tposition: relative;\n}\nsvg[data-v-ae5d5364] {\n\twidth: 100%;\n\theight: 100%;\n}\npath[data-v-ae5d5364] {\n\tfill: none;\n}\npath.curve[data-v-ae5d5364] {\n\tstroke: #f72858;\n\tpointer-events: none;\n\tstroke-width: 2px;\n}\npath.curve_hover[data-v-ae5d5364] {\n\tstroke: transparent;\n\tstroke-width: 14px;\n}\npath.axes[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke: var(--color-title);\n\tstroke-width: 2px;\n}\npath.grid[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke-width: 1px;\n\topacity: 0.4;\n\tstroke: var(--color-title);\n}\n.zero_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 6px;\n\twidth: 6px;\n\tmargin: -3px;\n\tborder-radius: 3px;\n}\n#hover_note[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: aliceblue;\n\tcolor: #99a;\n\tpadding: 5px;\n\tborder-radius: 5px;\n\tz-index: 2;\n\ttransition: left 100ms linear, top 100ms linear;\n}\n#hover_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 10px;\n\twidth: 10px;\n\tmargin: -5px;\n\tborder-radius: 5px;\n\tz-index: 2;\n\ttransition: left 100ms linear, top 100ms linear;\n}\n", ""]);
+exports.push([module.i, "\n#graph[data-v-ae5d5364] {\n\tposition: relative;\n}\nsvg[data-v-ae5d5364] {\n\twidth: 100%;\n\theight: 100%;\n}\npath[data-v-ae5d5364] {\n\tfill: none;\n}\npath.curve[data-v-ae5d5364] {\n\tstroke: #f72858;\n\tpointer-events: none;\n\tstroke-width: 2px;\n}\npath.curve_hover[data-v-ae5d5364] {\n\tstroke: transparent;\n\tstroke-width: 14px;\n}\npath.axes[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke: var(--color-title);\n\tstroke-width: 2px;\n}\npath.grid[data-v-ae5d5364] {\n\tpointer-events: none;\n\tstroke-width: 1px;\n\topacity: 0.4;\n\tstroke: var(--color-title);\n}\n.zero_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 6px;\n\twidth: 6px;\n\tmargin: -3px;\n\tborder-radius: 3px;\n}\n#hover_note[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: aliceblue;\n\tcolor: #99a;\n\tpadding: 5px;\n\tborder-radius: 5px;\n\tz-index: 2;\n}\n#hover_dot[data-v-ae5d5364] {\n\tposition: absolute;\n\tpointer-events: none;\n\tbackground-color: #f72858;\n\theight: 10px;\n\twidth: 10px;\n\tmargin: -5px;\n\tborder-radius: 5px;\n\tz-index: 2;\n}\n", ""]);
 
 // exports
 

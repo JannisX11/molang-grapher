@@ -79,7 +79,7 @@ export default {
 			
 			this.hover_note = `${Math.roundTo(X, 3)} / ${Math.roundTo(val, 3)}`;
 			this.hover_note_X = this.posX + X   * this.scale;
-			this.hover_note_Y = this.posY + val * this.scale;
+			this.hover_note_Y = this.posY - val * this.scale;
 		},
 		exitCurve(event) {
 			this.hover_note = '';
@@ -138,23 +138,23 @@ export default {
 		updateGraph() {
 			X = 0;
 			this.zero_points.splice(0, Infinity, X);
-			this.Y_axis_cross = MolangParser.parse(this.code);
+			this.Y_axis_cross = -MolangParser.parse(this.code);
 
 			let path = `M${this.posX} ${this.posY}`;
 			let before = 0;
 			for (var x = 0; x < window.innerWidth; x += 1) {
 				X = (x - this.posX) / this.scale;
-				let val = MolangParser.parse(this.code);
+				let val = -MolangParser.parse(this.code);
 
-				path += x ? ' L' : 'M';
-				path += `${ x } ${ this.posY + val * this.scale }`;
+				path += (x && !isNaN(val) && !isNaN(before)) ? ' L' : 'M';
+				path += `${ x } ${ Math.clamp((this.posY + val * this.scale), -30, window.innerHeight) }`;
 
 				// Zero Points
-				if (val == 0) {
-					this.zero_points.push(X);
+				if (val == 0 && before != 0) {
+					this.zero_points.safePush(X);
 				} else if ((before > 0 && val < 0) || (before < 0 && val > 0)) {
 					let lerp = 1 / ((val - before) / val);
-					this.zero_points.push(X - lerp/this.scale);
+					this.zero_points.safePush(X - lerp/this.scale);
 				}
 				
 				before = val;
@@ -220,7 +220,6 @@ export default {
 		padding: 5px;
 		border-radius: 5px;
 		z-index: 2;
-		transition: left 100ms linear, top 100ms linear;
 	}
 	#hover_dot {
 		position: absolute;
@@ -231,7 +230,6 @@ export default {
 		margin: -5px;
 		border-radius: 5px;
 		z-index: 2;
-		transition: left 100ms linear, top 100ms linear;
 	}
 </style>
 

@@ -20,8 +20,17 @@
 import Molang from 'molangjs';
 const MolangParser = new Molang();
 
+global.Molang = MolangParser;
+
 let X = 0;
-const X_variables = ['query.anim_time', 'time', 'query.modified_distance_moved', 'variable.particle_age', 'variable.emitter_age']
+const X_variables = [
+	'query.anim_time',
+	'query.life_time',
+	'time',
+	'query.modified_distance_moved',
+	'variable.particle_age',
+	'variable.emitter_age'
+]
 MolangParser.variableHandler = function(variable) {
 	if (X_variables.includes(variable)) {
 		return X;

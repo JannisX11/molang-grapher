@@ -5,9 +5,6 @@
 </template>
 
 <script>
-import $ from 'jquery'
-import App from "./App";
-
 import "prismjs";
 import "prismjs/themes/prism-okaidia.css";
 import 'molangjs/syntax/molang-prism-syntax';

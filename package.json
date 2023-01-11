@@ -1,6 +1,6 @@
 {
 	"name": "molang-grapher",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "MoLang Grapher",
 	"author": {
 		"name": "JannisX11",
@@ -36,8 +36,7 @@
 		"@fortawesome/free-solid-svg-icons": "^5.15.3",
 		"@fortawesome/vue-fontawesome": "^0.1.10",
 		"@popperjs/core": "^2.9.2",
-		"jquery": "^3.6.0",
-		"molangjs": "^1.4.1",
+		"molangjs": "^1.6.0",
 		"prismjs": "^1.25.0",
 		"vue": "^2.6.11",
 		"vue-prism-component": "^1.2.0",

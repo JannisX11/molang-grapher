@@ -1,6 +1,3 @@
-import $ from 'jquery'
-
-
 function bbuid(l) {
 	l = l || 1
 	let chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -220,109 +217,9 @@ function compileJSON(object, options) {
 	return handleVar(object, 1)
 }
 
-const IO = {
-	import: function (options, cb) {
-		if (typeof options !== 'object') {options = {}}
-		$('<input '+
-			'type="file'+
-			'" accept=".'+(options.extensions ? options.extensions.join(',.'): '')+
-			'" multiple="'+(options.multiple === true)+
-		'">').change(function(e) {
-			var input = this;
-			var results = [];
-			var result_count = 0;
-			var i = 0;
-			while (i < input.files.length) {
-				(function() {
-					var file = input.files[i]
-					var reader = new FileReader()
-					reader.i = i
-					reader.onloadend = function() {
-
-						if (reader.result.byteLength) {
-							var arr = new Uint8Array(reader.result)
-							var targa_loader = new Targa()
-							targa_loader.load(arr)
-							var result = targa_loader.getDataURL()
-						} else {
-							var result = reader.result
-						}
-						results[this.i] = {
-							name: file.name,
-							path: file.name,
-							content: result
-						}
-						result_count++;
-						if (result_count === input.files.length) {
-							cb(results)
-						}
-					}
-					if (options.readtype === 'image') {
-						if (pathToExtension(file.name) === 'tga') {
-							reader.readAsArrayBuffer(file)
-						} else {
-							reader.readAsDataURL(file)
-						}
-					} else if (options.readtype === 'buffer') {
-						reader.readAsArrayBuffer(file)
-					} else /*text*/ {
-						reader.readAsText(file)
-					}
-					i++;
-				})()
-			}
-		}).click()
-	},
-	export: function(options, cb) {
-		if (!options) return;
-
-		var file_name = options.name + (options.extensions ? '.'+options.extensions[0] : '')
-		var callback_used;
-		if (options.custom_writer) {
-			options.custom_writer(options.content, file_name)
-			
-		} else if (options.savetype === 'image') {
-
-			var element = document.createElement('a');
-			element.href = options.content
-			element.download = file_name;
-			element.style.display = 'none';
-			if (Blockbench.browser === 'firefox') document.body.appendChild(element);
-			element.click();
-			if (Blockbench.browser === 'firefox') document.body.removeChild(element);
-
-		} else if (options.savetype === 'zip') {
-			saveAs(options.content, file_name)
-
-		} else {
-			//var blob = new Blob([options.content], {type: "text/plain;charset=utf-8"});
-
-			var element = document.createElement('a');
-			element.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(options.content);
-			element.download = file_name
-			element.style.display = 'none';
-			document.body.appendChild(element);
-			element.click();
-			document.body.removeChild(element);
-
-
-			//saveAs(blob, file_name, {autoBOM: true})
-		}
-		if (options.project_file) {
-			Prop.project_saved = true;
-			setProjectTitle(options.name)
-		}
-		if (!callback_used && typeof cb === 'function') {
-			cb()
-		}
-	}
-}
-
-
 export {
 	bbuid, guid,
 	compileJSON,
-	IO,
 	pathToExtension,
 	pathToName
 }

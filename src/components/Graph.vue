@@ -27,6 +27,7 @@ const X_variables = [
 	'query.anim_time',
 	'query.life_time',
 	'time',
+	'x',
 	'query.modified_distance_moved',
 	'variable.particle_age',
 	'variable.emitter_age'

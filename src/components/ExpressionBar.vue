@@ -1,16 +1,39 @@
 <template>
     <div id="expression_bar">
-		<prism-editor v-model="content" @change="updateInput($event)" :language="language" :line-numbers="true" ref="input" />
+		<prism-editor
+			v-model="content"
+			@change="updateInput($event)"
+			:language="language"
+			:autocomplete="autocomplete"
+			:highlight="highlighter"
+			:line-numbers="true"
+			ref="input"
+		/>
     </div>
 </template>
 
 <script>
 import "prismjs";
-import "prismjs/themes/prism-okaidia.css";
-import 'molangjs/syntax/molang-prism-syntax';
+import syntax from 'molangjs/syntax/molang-prism-syntax';
 
-import "vue-prism-editor/dist/VuePrismEditor.css";
-import PrismEditor from "vue-prism-editor";
+import Prism from 'prismjs/components/prism-core';
+import "prismjs/themes/prism-okaidia.css";
+
+import 'root/packages/vue-prism-editor/dist/prismeditor.min.css';
+import {PrismEditor} from "root/packages/vue-prism-editor";
+
+import getAutocompleteData from './../molang_autocomplete'
+
+const Language = {
+	'string': /("|')(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+	'function-name': /\b(?!\d)math\.\w+(?=[\t ]*\()/i,
+	'selector': /\b(?!\d)(query|variable|temp|context|math|q|v|t|c)\.\w+/i,
+	'boolean': /\b(?:true|false)\b/i,
+	'number': /(?:\b\d+(?:\.\d+f?)?(?:[ed][+-]\d+)?|&h[a-f\d]+)\b/i,
+	'operator': /&&|\|\||[-+*/!<>]=?|[:?=]/i,
+	'keyword': /\b(return|loop|for_each|break|continue)\b/i,
+	'punctuation': /[.,;()[\]{}]/,
+};
 
 const ExpandedInput = {
     input: 0,
@@ -32,6 +55,12 @@ export default {
 		language: 'molang'
 	}},
 	methods: {
+		autocomplete(text, position) {
+			return getAutocompleteData(text, position, 'input')
+		},
+		highlighter() {
+			return Prism.highlight(this.code, Language)
+		},
 		updateInput(text) {
 			this.$emit('change', text)
 		}
